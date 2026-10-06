@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LMG Job Center">
+  <meta name="theme-color" content="#14213d">
+  <title>LMG Job Center</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js" } }
+  </script>
+</head>
+<body>
+  <!-- 3D office of Mr Fuhs -->
+  <div id="stage">
+    <canvas id="scene" aria-label="Mr Fuhs' office in 3D. Tap Mr Fuhs or the robot."></canvas>
+    <div id="bubble" class="bubble" hidden></div>
+    <div class="stage-label">
+      <span class="logo">LMG<span>Job Center</span></span>
+      <span class="sub">Institute for Future Work Research · Office of the Director</span>
+    </div>
+  </div>
+
+  <!-- Login -->
+  <section id="login" class="panel" hidden>
+    <h1>Welcome to the LMG Job Center</h1>
+    <p class="lead">You are a new researcher at our institute. Many people are worried: <strong>Will AI take my job?</strong>
+      Our job is to find out – and to <strong>advise people</strong> which jobs are a good choice for the future.</p>
+    <div class="memo">
+      <div class="memo-head">📎 Memo from the Director, Mr Fuhs</div>
+      <p>Hi. Uh… welcome. I'm very busy right now (with my coffee). Here is your research order: you will get
+        <strong>four jobs</strong>. Find out <em>how long it will take until AI or robots can do each job</em>.
+        Collect arguments <strong>for</strong> and <strong>against</strong> replaceability. Then give advice for people who want this job.</p>
+      <p>Don't wake me up unless it's important. – <em>F.</em></p>
+    </div>
+    <form id="loginForm" autocomplete="off">
+      <label for="nameInput">Your researcher name (first name + last name initial, e.g. <em>Lena K.</em>)</label>
+      <div class="row">
+        <input id="nameInput" name="name" required maxlength="40" placeholder="Your name" enterkeyhint="go">
+        <button class="btn primary" type="submit">Get my research order →</button>
+      </div>
+      <p class="fine">Your answers are saved only on this iPad (in the browser). Nothing is sent to the internet.</p>
+    </form>
+  </section>
+
+  <!-- Dashboard -->
+  <section id="dashboard" class="panel" hidden>
+    <div class="dash-head">
+      <div>
+        <div class="kicker">Research order for</div>
+        <h2 id="researcherName"></h2>
+      </div>
+      <div class="dash-actions">
+        <button class="btn ghost" id="reportBtn" type="button">📄 Consulting report</button>
+        <button class="btn ghost" id="menuBtn" type="button" aria-label="More options">⋯</button>
+      </div>
+    </div>
+
+    <div class="progress-wrap" aria-live="polite">
+      <div class="progress-label"><span>Research progress</span><strong id="progressText">0 %</strong></div>
+      <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+        <div class="progress-ticks"><span></span><span></span><span></span></div>
+      </div>
+      <div class="progress-jobs" id="progressJobs"></div>
+    </div>
+
+    <div class="cards" id="cards"></div>
+
+    <details class="howto">
+      <summary>How do I research a job?</summary>
+      <ol>
+        <li>Find out what people in this job <strong>actually do</strong> all day (e.g. on <em>planet-beruf.de</em>, <em>berufenet.arbeitsagentur.de</em>, YouTube "a day in the life of …").</li>
+        <li>Check the <strong>Job-Futuromat</strong> (job-futuromat.iab.de) – it shows which tasks of a job could already be automated.</li>
+        <li>Look for news: Are there already robots or AI tools for this job?</li>
+        <li>Write at least <strong>2 arguments for</strong> and <strong>2 arguments against</strong> replaceability.</li>
+        <li>Decide: How long until AI/robots can do most of this job? Then write your <strong>advice</strong> for a person who wants this job.</li>
+      </ol>
+    </details>
+  </section>
+
+  <!-- Job form (sheet) -->
+  <section id="sheet" class="sheet" hidden aria-modal="true" role="dialog" aria-labelledby="jobTitle">
+    <div class="sheet-inner">
+      <header class="sheet-head">
+        <button class="btn ghost" id="closeSheet" type="button">← Back</button>
+        <div class="sheet-progress"><div id="sheetFill"></div></div>
+        <span class="saved" id="savedNote">Saved ✓</span>
+      </header>
+
+      <div class="job-hero">
+        <div class="job-icon" id="jobIcon"></div>
+        <div>
+          <div class="kicker" id="jobKicker">Job file</div>
+          <h2 id="jobTitle"></h2>
+          <p id="jobDesc"></p>
+        </div>
+      </div>
+
+      <div class="hints">
+        <strong>💡 Questions to think about</strong>
+        <ul id="jobHints"></ul>
+      </div>
+
+      <form id="jobForm" autocomplete="off">
+        <fieldset>
+          <legend><span class="num">1</span> What do people in this job do? <span class="req" data-check="tasks"></span></legend>
+          <textarea name="tasks" rows="3" placeholder="Typical tasks of a normal working day …"></textarea>
+        </fieldset>
+
+        <div class="two-col">
+          <fieldset class="pro">
+            <legend><span class="num">2</span> 🤖 Arguments FOR replaceability <span class="req" data-check="pro"></span></legend>
+            <p class="help">Why could AI or robots do this job?</p>
+            <div class="arglist" data-list="pro"></div>
+            <button class="btn small add" type="button" data-add="pro">+ add argument</button>
+          </fieldset>
+
+          <fieldset class="contra">
+            <legend><span class="num">3</span> 🧑 Arguments AGAINST replaceability <span class="req" data-check="contra"></span></legend>
+            <p class="help">Why will humans still be needed?</p>
+            <div class="arglist" data-list="contra"></div>
+            <button class="btn small add" type="button" data-add="contra">+ add argument</button>
+          </fieldset>
+        </div>
+
+        <fieldset>
+          <legend><span class="num">4</span> How much of this job can be automated? <span class="risk-val" id="riskVal">50 %</span></legend>
+          <input type="range" name="risk" min="0" max="100" step="5" value="50" class="risk">
+          <div class="scale"><span>0 % – safe</span><span>100 % – fully automatable</span></div>
+        </fieldset>
+
+        <fieldset>
+          <legend><span class="num">5</span> When will AI/robots be able to do <em>most</em> of this job? <span class="req" data-check="estimate"></span></legend>
+          <div class="chips" id="estimateChips"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend><span class="num">6</span> Your advice for a person who wants this job <span class="req" data-check="advice"></span></legend>
+          <textarea name="advice" rows="3" placeholder="Should they choose this job? Which skills should they learn to stay safe?"></textarea>
+        </fieldset>
+
+        <fieldset>
+          <legend><span class="num">7</span> Sources <span class="opt">(optional)</span></legend>
+          <textarea name="sources" rows="2" placeholder="Websites, videos, articles you used …"></textarea>
+        </fieldset>
+      </form>
+
+      <div class="sheet-foot">
+        <p id="missing" class="missing"></p>
+        <button class="btn primary" id="doneBtn" type="button">Save & back to office</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Report -->
+  <section id="report" class="sheet" hidden role="dialog" aria-labelledby="reportTitle">
+    <div class="sheet-inner">
+      <header class="sheet-head noprint">
+        <button class="btn ghost" id="closeReport" type="button">← Back</button>
+        <span></span>
+        <button class="btn ghost" id="printBtn" type="button">🖨️ Print / PDF</button>
+      </header>
+      <div id="reportBody"></div>
+    </div>
+  </section>
+
+  <!-- Menu -->
+  <dialog id="menu">
+    <h3>Options</h3>
+    <button class="btn" id="exportBtn" type="button">⬇️ Download my research (file)</button>
+    <button class="btn" id="copyBtn" type="button">📋 Copy research as text</button>
+    <button class="btn danger" id="resetBtn" type="button">🗑️ Log out & delete my answers</button>
+    <button class="btn ghost" id="closeMenu" type="button">Close</button>
+  </dialog>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
