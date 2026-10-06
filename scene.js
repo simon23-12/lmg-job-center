@@ -77,7 +77,7 @@ function buildRoom() {
   for (let i = 1; i < 4; i++) boardG.add(box(0.03, 0.32, 0.04, mat(0xffffff), -1 + i * 0.5, -0.15, 0.07));
   scene.add(boardG);
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.35),
-    new THREE.MeshBasicMaterial({ map: textTexture('DIRECTOR · MR FUHS', { w: 512, h: 112, bg: '#c9a227', color: '#14213d', font: 'bold 50px "Space Grotesk", sans-serif' }) }));
+    new THREE.MeshBasicMaterial({ map: textTexture('DIRECTOR · MR. FUHS', { w: 512, h: 112, bg: '#c9a227', color: '#14213d', font: 'bold 50px "Space Grotesk", sans-serif' }) }));
   sign.position.set(0, 4.2, -2.88); scene.add(sign);
 
   // bookshelf with files
@@ -121,6 +121,14 @@ function buildDesk() {
   mon.add(box(0.75, 0.48, 0.05, mat(0x222831), 0, 0.45, 0));
   const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.68, 0.4), new THREE.MeshBasicMaterial({ map: textTexture('💤 screensaver', { w: 256, h: 150, bg: '#1d3a7a', font: '28px sans-serif' }) }));
   scr.position.set(0, 0.45, 0.03); mon.add(scr); desk.add(mon);
+  // name plate facing the visitors
+  const plate = new THREE.Group(); plate.position.set(-0.3, 0.83, 0.4);
+  plate.add(box(0.62, 0.05, 0.14, mat(0x3b2a1c), 0, 0.025, 0));
+  const front = box(0.58, 0.15, 0.03, mat(0xc9a227, { metalness: 0.6, roughness: 0.35 }), 0, 0.12, 0.02); front.rotation.x = -0.3; plate.add(front);
+  const label = new THREE.Mesh(new THREE.PlaneGeometry(0.54, 0.13),
+    new THREE.MeshBasicMaterial({ map: textTexture('Mr. Fuhs', { w: 512, h: 124, color: '#1b1b1b', font: 'bold 84px "Space Grotesk", sans-serif' }), transparent: true }));
+  label.position.set(0, 0.12, 0.04); label.rotation.x = -0.3; plate.add(label);
+  desk.add(plate);
   // stack of job files
   const files = [0xe5484d, 0x3a6ff7, 0x2f9e6e, 0xf4a259];
   files.forEach((c, i) => { const f = box(0.5, 0.04, 0.36, mat(c), 0.75, 0.86 + i * 0.045, -0.15); f.rotation.y = (i - 1.5) * 0.12; desk.add(f); });
@@ -135,7 +143,7 @@ function buildDesk() {
 
 function buildFuhs() {
   fuhs = new THREE.Group(); fuhs.name = 'fuhs';
-  const suit = mat(0x4a5878), skin = mat(0xf0c8a0), shirt = mat(0xffffff), hair = mat(0x6b6b6b), shoe = mat(0x2b1d14), pants = mat(0x38425c);
+  const suit = mat(0x4d6f9c), skin = mat(0xedc3a0), hair = mat(0x9b6a3a), beard = mat(0x7a5534), brow = mat(0x4a3220), shoe = mat(0x2b1d14), pants = mat(0x3a3f4a);
 
   // office chair
   const chair = new THREE.Group(); chair.position.set(0, 0, -1.25);
@@ -148,25 +156,35 @@ function buildFuhs() {
   // reclined upper body (pivot at hips)
   const upper = new THREE.Group(); upper.position.set(0, 0.68, -1.25); upper.rotation.x = -0.5; fuhs.add(upper);
   fuhsChest = new THREE.Group(); upper.add(fuhsChest);
+  // casual blue button-up shirt with open collar
   const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.27, 0.45, 4, 10), suit); torso.position.y = 0.4; torso.castShadow = true; fuhsChest.add(torso);
   const belly = new THREE.Mesh(new THREE.SphereGeometry(0.27, 10, 8), suit); belly.position.set(0, 0.25, 0.1); fuhsChest.add(belly);
-  fuhsChest.add(box(0.12, 0.4, 0.05, shirt, 0, 0.55, 0.25));
-  const tie = box(0.07, 0.32, 0.03, mat(0xe5484d), 0, 0.52, 0.28); tie.rotation.z = 0.15; fuhsChest.add(tie);
+  for (const s of [-1, 1]) { const c = box(0.14, 0.05, 0.12, mat(0x5a7fae), s * 0.08, 0.76, 0.17); c.rotation.set(-0.4, 0, s * -0.5); fuhsChest.add(c); }
+  const neckV = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.16, 3), skin); neckV.rotation.z = Math.PI; neckV.position.set(0, 0.68, 0.24); fuhsChest.add(neckV);
+  for (let i = 0; i < 3; i++) fuhsChest.add(box(0.025, 0.025, 0.02, mat(0xffffff), 0, 0.52 - i * 0.12, 0.27));
 
   // head
   fuhsHead = new THREE.Group(); fuhsHead.position.set(0, 0.98, 0); upper.add(fuhsHead);
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.25, 14, 12), skin); head.castShadow = true; fuhsHead.add(head);
-  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 6), skin); nose.position.set(0, -0.01, 0.25); fuhsHead.add(nose);
-  const hairM = new THREE.Mesh(new THREE.SphereGeometry(0.26, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2.4), hair); hairM.rotation.x = -0.6; hairM.position.y = 0.02; fuhsHead.add(hairM);
-  // closed eyes (lines) + glasses
-  for (const x of [-0.09, 0.09]) {
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.25, 14, 12), skin); head.scale.set(0.92, 1.05, 1); head.castShadow = true; fuhsHead.add(head);
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.1, 6), skin); nose.rotation.x = Math.PI / 2 + 0.3; nose.position.set(0, -0.01, 0.26); fuhsHead.add(nose);
+  // light-brown hair, swept up into a tousled quiff
+  const hairCap = new THREE.Mesh(new THREE.SphereGeometry(0.255, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2.6), hair); hairCap.scale.set(0.95, 1, 1); hairCap.rotation.x = -0.35; hairCap.position.y = 0.04; fuhsHead.add(hairCap);
+  [[0, 0.22, 0.13, 0.5], [-0.08, 0.21, 0.1, 0.8], [0.09, 0.22, 0.09, 0.2], [0.03, 0.25, 0.03, -0.3], [-0.1, 0.23, -0.04, 1.1]].forEach(([x, y, z, r]) => {
+    const tuft = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.2, 5), hair);
+    tuft.position.set(x, y, z); tuft.rotation.set(-0.5, r, x * 3); tuft.castShadow = true; fuhsHead.add(tuft);
+  });
+  // short beard along the jaw + moustache
+  const beardM = new THREE.Mesh(new THREE.SphereGeometry(0.258, 14, 8, Math.PI / 2 - 1.25, 2.5, Math.PI * 0.56, Math.PI * 0.36), beard);
+  beardM.scale.set(0.93, 1.05, 1.02); fuhsHead.add(beardM);
+  fuhsHead.add(box(0.12, 0.03, 0.03, beard, 0, -0.075, 0.245));
+  // closed (sleeping) eyes + dark eyebrows
+  for (const x of [-0.085, 0.085]) {
     fuhsHead.add(box(0.07, 0.012, 0.01, mat(0x222222), x, 0.04, 0.235));
-    const g = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.012, 6, 16), mat(0x222222)); g.position.set(x, 0.04, 0.245); fuhsHead.add(g);
+    const b = box(0.09, 0.022, 0.02, brow, x, 0.095, 0.228); b.rotation.z = x > 0 ? -0.12 : 0.12; fuhsHead.add(b);
   }
-  fuhsHead.add(box(0.06, 0.012, 0.01, mat(0x222222), 0, 0.05, 0.25));
-  const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.035, 0.012, 6, 12), mat(0x7a3b2e)); mouth.position.set(0, -0.11, 0.22); fuhsHead.add(mouth);
-  fuhsHead.add(new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), skin).translateX(-0.25));
-  fuhsHead.add(new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), skin).translateX(0.25));
+  const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.03, 0.01, 6, 12), mat(0x7a3b2e)); mouth.position.set(0, -0.12, 0.235); fuhsHead.add(mouth);
+  fuhsHead.add(new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), skin).translateX(-0.235));
+  fuhsHead.add(new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), skin).translateX(0.235));
 
   // arms folded behind head
   for (const s of [-1, 1]) {
