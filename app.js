@@ -1,5 +1,5 @@
-import { JOBS, ESTIMATES } from './jobs.js?v=4';
-import { initScene, sayFromFuhs, setSceneActive, setProgressGlow } from './scene.js?v=4';
+import { JOBS, ESTIMATES } from './jobs.js?v=5';
+import { initScene, sayFromFuhs, setSceneActive, setProgressGlow } from './scene.js?v=5';
 
 const KEY = 'lmg-jobcenter-v1';
 const $ = (s, el = document) => el.querySelector(s);

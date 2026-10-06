@@ -288,7 +288,7 @@ function loop() {
 function render(t) {
   const d = camera.userData.dist || 5.5;
   camera.position.set(Math.sin(t * 0.12) * 1.1, 2.25 + Math.sin(t * 0.2) * 0.1, d);
-  camera.lookAt(0, 1.05, -0.4);
+  if (location.hash === "#closeup") camera.lookAt(0, 1.55, -1.3); else camera.lookAt(0, 1.05, -0.4);
 
   // Fuhs snoring
   const breathe = Math.sin(t * 1.4);
