@@ -241,7 +241,7 @@ export function initScene(canvasEl, bubble) {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x20304f);
   scene.fog = new THREE.Fog(0x20304f, 9, 16);
-  camera = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
+  camera = new THREE.PerspectiveCamera(34, 1, 0.1, 50);
 
   scene.add(new THREE.HemisphereLight(0xfff4e0, 0x404a66, 1.3));
   const sun = new THREE.DirectionalLight(0xffe2b8, 2.2);
@@ -268,7 +268,7 @@ function resize() {
   camera.aspect = w / h;
   // portrait iPads are narrower: move camera back so everything fits
   const dist = camera.aspect < 1.4 ? 6.4 : camera.aspect < 2 ? 5.2 : 4.3;
-  camera.userData.dist = dist;
+  camera.userData.dist = location.hash === "#closeup" ? 2.2 : dist;
   camera.updateProjectionMatrix();
   if (!running) render(clock.getElapsedTime());
 }
