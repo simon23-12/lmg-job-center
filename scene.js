@@ -249,7 +249,7 @@ function resize() {
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   // portrait iPads are narrower: move camera back so everything fits
-  const dist = camera.aspect < 1.4 ? 7.2 : camera.aspect < 2 ? 5.8 : 5;
+  const dist = camera.aspect < 1.4 ? 6.4 : camera.aspect < 2 ? 5.2 : 4.3;
   camera.userData.dist = dist;
   camera.updateProjectionMatrix();
   if (!running) render(clock.getElapsedTime());
@@ -269,8 +269,8 @@ function loop() {
 
 function render(t) {
   const d = camera.userData.dist || 5.5;
-  camera.position.set(Math.sin(t * 0.12) * 1.1, 2.5 + Math.sin(t * 0.2) * 0.1, d);
-  camera.lookAt(0, 1.15, -0.6);
+  camera.position.set(Math.sin(t * 0.12) * 1.1, 2.25 + Math.sin(t * 0.2) * 0.1, d);
+  camera.lookAt(0, 1.05, -0.4);
 
   // Fuhs snoring
   const breathe = Math.sin(t * 1.4);

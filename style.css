@@ -122,7 +122,8 @@ textarea { resize: vertical; line-height: 1.45; }
 .progress-jobs { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 8px; font-size: 13px; color: var(--muted); text-align: center; }
 .progress-jobs .done { color: var(--contra); font-weight: 600; }
 
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 16px; }
+.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+@media (max-width: 600px) { .cards { grid-template-columns: 1fr; } }
 .card {
   text-align: left; font: inherit; color: inherit; cursor: pointer; touch-action: manipulation;
   background: #fff; border: 2px solid var(--line); border-radius: var(--radius); padding: 18px;
